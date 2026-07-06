@@ -1,0 +1,1882 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>수식 사전 — 고등 수학·과학</title>
+<script>
+(function () {
+  var saved = null;
+  try { saved = localStorage.getItem('formulaTheme'); } catch (e) {}
+  var media = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)');
+  var systemTheme = media && media.matches ? 'light' : 'dark';
+  document.documentElement.dataset.theme = saved || systemTheme;
+})();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&family=Noto+Sans+KR:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+<style>
+:root {
+color-scheme: dark;
+--bg: #0d0f14;
+--surface: #14171f;
+--surface2: #1a1e28;
+--border: #252a38;
+--accent: #5b8dee;
+--accent2: #e8845b;
+--accent3: #5be8b0;
+--accent4: #e85ba0;
+--text: #e8eaf0;
+--text-muted: #6b7290;
+--text-dim: #3d4560;
+--header-bg: rgba(13,15,20,.9);
+--grid-line: rgba(91,141,238,.04);
+--shadow-soft: rgba(0,0,0,.18);
+}
+
+:root[data-theme="light"] {
+color-scheme: light;
+--bg:
+  radial-gradient(circle at 12% 0%, rgba(91,141,238,.22), transparent 34%),
+  radial-gradient(circle at 88% 12%, rgba(232,91,160,.16), transparent 30%),
+  radial-gradient(circle at 50% 100%, rgba(91,232,176,.12), transparent 38%),
+  linear-gradient(135deg, #f9fcff 0%, #eef5ff 48%, #fbfdff 100%);
+--surface: rgba(255,255,255,.54);
+--surface2: rgba(255,255,255,.38);
+--border: rgba(255,255,255,.58);
+--accent: #3f73d8;
+--accent2: #d76e45;
+--accent3: #21a978;
+--accent4: #d84f8d;
+--text: #151922;
+--text-muted: #657087;
+--text-dim: #9ba6ba;
+--header-bg: rgba(255,255,255,.38);
+--grid-line: rgba(63,115,216,.08);
+--shadow-soft: rgba(54,76,118,.14);
+--glass-highlight: rgba(255,255,255,.72);
+--glass-inset: rgba(255,255,255,.46);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+background: var(--bg);
+color: var(--text);
+transition: background .2s ease, color .2s ease;
+font-family: 'Noto Sans KR', sans-serif;
+font-weight: 300;
+min-height: 100vh;
+overflow-x: hidden;
+}
+
+body::before {
+content: '';
+position: fixed;
+inset: 0;
+background-image:
+linear-gradient(var(--grid-line) 1px, transparent 1px),
+linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+background-size: 40px 40px;
+pointer-events: none;
+z-index: 0;
+}
+
+header {
+position: sticky;
+top: 0;
+z-index: 100;
+background: var(--header-bg);
+backdrop-filter: blur(16px);
+border-bottom: 1px solid var(--border);
+padding: 0 32px;
+display: flex;
+align-items: center;
+justify-content: space-between;
+height: 64px;
+}
+
+.logo {
+font-family: 'Noto Serif KR', serif;
+font-size: 1.1rem;
+font-weight: 700;
+letter-spacing: .05em;
+color: var(--text);
+white-space: nowrap;
+}
+.logo span { color: var(--accent); }
+
+.search-wrap {
+position: relative;
+width: 320px;
+}
+.search-wrap input {
+width: 100%;
+background: var(--surface2);
+border: 1px solid var(--border);
+border-radius: 8px;
+padding: 8px 16px 8px 40px;
+color: var(--text);
+font-family: 'Noto Sans KR', sans-serif;
+font-size: .85rem;
+outline: none;
+transition: border-color .2s;
+}
+.search-wrap input:focus { border-color: var(--accent); }
+.search-wrap input::placeholder { color: var(--text-muted); }
+.search-icon {
+position: absolute;
+left: 12px;
+top: 50%;
+transform: translateY(-50%);
+color: var(--text-muted);
+font-size: .9rem;
+pointer-events: none;
+}
+
+.header-actions {
+display: flex;
+align-items: center;
+gap: 10px;
+}
+
+.theme-toggle {
+width: 38px;
+height: 38px;
+border-radius: 10px;
+border: 1px solid var(--border);
+background: var(--surface2);
+color: var(--text);
+display: inline-flex;
+align-items: center;
+justify-content: center;
+cursor: pointer;
+font-size: 1rem;
+line-height: 1;
+transition: border-color .2s, background .2s, transform .2s;
+flex-shrink: 0;
+}
+.theme-toggle:hover {
+border-color: var(--accent);
+transform: translateY(-1px);
+}
+.theme-toggle:focus-visible {
+outline: 2px solid var(--accent);
+outline-offset: 2px;
+}
+.theme-toggle .theme-icon {
+display: block;
+transform: translateY(-1px);
+}
+
+:root[data-theme="light"] body {
+background-attachment: fixed;
+}
+
+:root[data-theme="light"] header,
+:root[data-theme="light"] nav,
+:root[data-theme="light"] .drawer,
+:root[data-theme="light"] .card,
+:root[data-theme="light"] .formula-block,
+:root[data-theme="light"] .search-result-item,
+:root[data-theme="light"] .search-wrap input,
+:root[data-theme="light"] .theme-toggle {
+backdrop-filter: blur(22px) saturate(145%);
+-webkit-backdrop-filter: blur(22px) saturate(145%);
+box-shadow:
+  0 18px 45px var(--shadow-soft),
+  inset 0 1px 0 var(--glass-highlight),
+  inset 0 -1px 0 var(--glass-inset);
+}
+
+:root[data-theme="light"] header {
+border-bottom-color: rgba(255,255,255,.56);
+}
+
+:root[data-theme="light"] nav,
+:root[data-theme="light"] .drawer {
+background: rgba(255,255,255,.30);
+border-color: rgba(255,255,255,.52);
+}
+
+:root[data-theme="light"] .card,
+:root[data-theme="light"] .search-result-item {
+background: linear-gradient(145deg, rgba(255,255,255,.60), rgba(255,255,255,.34));
+border-color: rgba(255,255,255,.62);
+}
+
+:root[data-theme="light"] .formula-block,
+:root[data-theme="light"] .search-wrap input,
+:root[data-theme="light"] .theme-toggle {
+background: linear-gradient(145deg, rgba(255,255,255,.52), rgba(255,255,255,.26));
+border-color: rgba(255,255,255,.58);
+}
+
+:root[data-theme="light"] .nav-item:hover,
+:root[data-theme="light"] .drawer-item:hover {
+background: rgba(255,255,255,.35);
+}
+
+:root[data-theme="light"] .nav-item.active,
+:root[data-theme="light"] .drawer-item.active {
+background: rgba(63,115,216,.13);
+}
+
+:root[data-theme="light"] .theme-toggle {
+cursor: default;
+}
+
+.layout {
+display: grid;
+grid-template-columns: 220px 1fr;
+min-height: calc(100vh - 64px);
+position: relative;
+z-index: 1;
+}
+
+nav {
+border-right: 1px solid var(--border);
+padding: 32px 0;
+position: sticky;
+top: 64px;
+height: calc(100vh - 64px);
+overflow-y: auto;
+}
+nav::-webkit-scrollbar { width: 4px; }
+nav::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+.nav-section { margin-bottom: 8px; }
+.nav-label {
+font-size: .68rem;
+letter-spacing: .12em;
+text-transform: uppercase;
+color: var(--text-dim);
+padding: 8px 24px 4px;
+}
+.nav-item {
+display: flex;
+align-items: center;
+gap: 10px;
+padding: 9px 24px;
+cursor: pointer;
+transition: background .15s, color .15s;
+font-size: .85rem;
+color: var(--text-muted);
+border-left: 2px solid transparent;
+user-select: none;
+}
+.nav-item:hover { background: var(--surface2); color: var(--text); }
+.nav-item.active {
+color: var(--text);
+border-left-color: var(--accent);
+background: rgba(91,141,238,.08);
+}
+.nav-item[data-target="calculus"].active { border-left-color: var(--accent2); background: rgba(232,132,91,.08); }
+.nav-item[data-target="physics"].active { border-left-color: var(--accent3); background: rgba(91,232,176,.08); }
+.nav-item[data-target="chemistry"].active { border-left-color: var(--accent4); background: rgba(232,91,160,.08); }
+.nav-dot {
+width: 6px; height: 6px;
+border-radius: 50%;
+flex-shrink: 0;
+}
+
+main {
+padding: 48px 56px;
+max-width: 960px;
+width: 100%;
+}
+
+.subject-header {
+display: none;
+margin-bottom: 40px;
+animation: fadeUp .4s ease;
+}
+.subject-header.visible { display: block; }
+
+@keyframes fadeUp {
+from { opacity: 0; transform: translateY(12px); }
+to { opacity: 1; transform: translateY(0); }
+}
+
+.subject-title {
+font-family: 'Noto Serif KR', serif;
+font-size: 2rem;
+font-weight: 700;
+margin-bottom: 8px;
+}
+.subject-desc {
+color: var(--text-muted);
+font-size: .9rem;
+line-height: 1.7;
+}
+
+.cards {
+display: grid;
+grid-template-columns: 1fr 1fr;
+gap: 16px;
+margin-top: 28px;
+}
+
+.card {
+background: var(--surface);
+border: 1px solid var(--border);
+border-radius: 12px;
+padding: 24px;
+transition: border-color .2s, transform .2s, background .2s;
+box-shadow: 0 14px 34px var(--shadow-soft);
+}
+.card:hover {
+border-color: rgba(91,141,238,.4);
+transform: translateY(-2px);
+}
+
+.card-name {
+font-size: .75rem;
+letter-spacing: .1em;
+text-transform: uppercase;
+margin-bottom: 16px;
+font-weight: 500;
+}
+
+.formula-block {
+background: var(--surface2);
+border-radius: 8px;
+padding: 16px 20px;
+margin-bottom: 12px;
+border-left: 3px solid transparent;
+max-width: 100%;
+overflow-x: auto;
+overflow-y: hidden;
+-webkit-overflow-scrolling: touch;
+overscroll-behavior-inline: contain;
+}
+.formula-block:last-child { margin-bottom: 0; }
+
+.formula-label {
+font-size: .72rem;
+color: var(--text-muted);
+margin-bottom: 8px;
+font-family: 'JetBrains Mono', monospace;
+}
+
+.katex-display { margin: 0 !important; }
+.formula-block .katex-display {
+width: max-content;
+min-width: 100%;
+max-width: none;
+}
+.formula-block .katex {
+white-space: nowrap;
+}
+.katex { font-size: 1.05rem !important; }
+
+.note {
+font-size: .78rem;
+color: var(--text-muted);
+margin-top: 10px;
+line-height: 1.6;
+border-top: 1px solid var(--border);
+padding-top: 10px;
+}
+
+[data-subject="algebra"] .card-name { color: var(--accent); }
+[data-subject="algebra"] .formula-block { border-left-color: var(--accent); }
+[data-subject="calculus"] .card-name { color: var(--accent2); }
+[data-subject="calculus"] .formula-block { border-left-color: var(--accent2); }
+[data-subject="physics"] .card-name { color: var(--accent3); }
+[data-subject="physics"] .formula-block { border-left-color: var(--accent3); }
+[data-subject="chemistry"] .card-name { color: var(--accent4); }
+[data-subject="chemistry"] .formula-block { border-left-color: var(--accent4); }
+
+#search-results { display: none; }
+#search-results.visible { display: block; }
+
+.search-result-item {
+background: var(--surface);
+border: 1px solid var(--border);
+border-radius: 10px;
+padding: 20px 24px;
+margin-bottom: 12px;
+animation: fadeUp .3s ease;
+}
+.search-result-item .result-tag {
+font-size: .7rem;
+padding: 2px 8px;
+border-radius: 4px;
+margin-bottom: 10px;
+display: inline-block;
+font-weight: 500;
+}
+.tag-algebra { background: rgba(91,141,238,.15); color: var(--accent); }
+.tag-calculus { background: rgba(232,132,91,.15); color: var(--accent2); }
+.tag-physics { background: rgba(91,232,176,.15); color: var(--accent3); }
+.tag-chemistry { background: rgba(232,91,160,.15); color: var(--accent4); }
+
+.no-result {
+text-align: center;
+color: var(--text-muted);
+padding: 80px 0;
+font-size: .9rem;
+}
+
+.hamburger {
+display: none;
+flex-direction: column;
+justify-content: center;
+gap: 5px;
+width: 36px;
+height: 36px;
+cursor: pointer;
+padding: 4px;
+border-radius: 6px;
+transition: background .15s;
+flex-shrink: 0;
+}
+.hamburger:hover { background: var(--surface2); }
+.hamburger span {
+display: block;
+width: 100%;
+height: 2px;
+background: var(--text);
+border-radius: 2px;
+transition: transform .3s, opacity .3s, width .3s;
+transform-origin: center;
+}
+.hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.hamburger.open span:nth-child(2) { opacity: 0; width: 0; }
+.hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+.drawer-overlay {
+position: fixed;
+inset: 0;
+background: rgba(0,0,0,.55);
+z-index: 200;
+opacity: 0;
+pointer-events: none;
+transition: opacity .25s;
+}
+.drawer-overlay.open { opacity: 1; pointer-events: all; }
+
+.drawer {
+position: fixed;
+top: 0;
+left: 0;
+width: 260px;
+height: 100%;
+background: var(--surface);
+border-right: 1px solid var(--border);
+z-index: 300;
+transform: translateX(-100%);
+transition: transform .28s cubic-bezier(.4,0,.2,1);
+padding: 80px 0 32px;
+overflow-y: auto;
+}
+.drawer.open { transform: translateX(0); }
+.drawer::-webkit-scrollbar { width: 4px; }
+.drawer::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+.drawer-section-label {
+font-size: .68rem;
+letter-spacing: .12em;
+text-transform: uppercase;
+color: var(--text-dim);
+padding: 16px 24px 4px;
+}
+.drawer-item {
+display: flex;
+align-items: center;
+gap: 12px;
+padding: 12px 24px;
+cursor: pointer;
+font-size: .92rem;
+color: var(--text-muted);
+border-left: 3px solid transparent;
+transition: background .15s, color .15s, border-color .15s;
+user-select: none;
+}
+.drawer-item:hover { background: var(--surface2); color: var(--text); }
+.drawer-item.active { color: var(--text); border-left-color: var(--accent); background: rgba(91,141,238,.08); }
+.drawer-item[data-target="calculus"].active { border-left-color: var(--accent2); background: rgba(232,132,91,.08); }
+.drawer-item[data-target="physics"].active { border-left-color: var(--accent3); background: rgba(91,232,176,.08); }
+.drawer-item[data-target="chemistry"].active { border-left-color: var(--accent4); background: rgba(232,91,160,.08); }
+.drawer-dot {
+width: 7px; height: 7px;
+border-radius: 50%;
+flex-shrink: 0;
+}
+
+
+/* 긴 수식은 페이지가 아니라 공식 박스 내부에서만 가로 스크롤되도록 제한 */
+html, body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.layout, main, .subject-header, .cards, .card, #search-results, .search-result-item {
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+main {
+  width: 100%;
+}
+
+.formula-block {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  overscroll-behavior-inline: contain;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-x pan-y;
+}
+
+.formula-block .katex-display {
+  display: inline-block !important;
+  width: max-content;
+  min-width: max-content;
+  max-width: none;
+}
+
+.formula-block .katex,
+.formula-block .katex-html {
+  white-space: nowrap;
+}
+
+.formula-block .note {
+  min-width: 0;
+  white-space: normal;
+}
+
+@media (max-width: 1100px) {
+main {
+  padding: 40px 36px;
+  max-width: 100%;
+}
+.cards {
+  gap: 14px;
+}
+.card {
+  padding: 22px;
+}
+}
+
+@media (max-width: 900px) {
+.layout { grid-template-columns: 220px minmax(0, 1fr); }
+nav { display: block; }
+main {
+  padding: 32px 24px;
+  max-width: 100%;
+}
+.cards { grid-template-columns: 1fr; }
+.search-wrap { width: min(48vw, 240px); }
+header { padding: 0 18px; }
+.subject-header { margin-bottom: 32px; }
+}
+
+@media (max-width: 600px) {
+.layout { grid-template-columns: 1fr; }
+nav { display: none; }
+.hamburger { display: flex; }
+body::before {
+  background-size: 32px 32px;
+}
+header {
+  height: auto;
+  min-height: 64px;
+  padding: 14px 16px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+header > div:first-child {
+  width: 100%;
+  justify-content: space-between;
+}
+.header-actions {
+  width: 100%;
+}
+.search-wrap {
+  width: 100%;
+}
+.theme-toggle {
+  width: 40px;
+  height: 40px;
+}
+.search-wrap input {
+  height: 40px;
+  font-size: .86rem;
+}
+main {
+  padding: 28px 16px;
+}
+.subject-title {
+  font-size: 1.6rem;
+}
+.subject-desc {
+  font-size: .82rem;
+}
+.cards {
+  gap: 14px;
+}
+.card {
+  padding: 18px;
+  border-radius: 10px;
+}
+.card:hover {
+  transform: none;
+}
+.formula-block {
+  padding: 14px 16px;
+}
+.katex {
+  font-size: .95rem !important;
+}
+.drawer {
+  width: 78vw;
+  max-width: 280px;
+}
+.drawer-item {
+  padding: 13px 24px;
+}
+.search-result-item {
+  padding: 18px;
+}
+}
+
+@media (max-width: 380px) {
+header {
+  padding: 12px 14px;
+}
+.logo {
+  font-size: 1rem;
+}
+.hamburger {
+  width: 34px;
+  height: 34px;
+}
+main {
+  padding: 24px 14px;
+}
+.subject-title {
+  font-size: 1.45rem;
+}
+.card {
+  padding: 16px;
+}
+.formula-block {
+  padding: 12px 14px;
+}
+.formula-label {
+  font-size: .68rem;
+}
+.katex {
+  font-size: .88rem !important;
+}
+}
+
+/* Final scroll containment: long formulas scroll horizontally inside their own box, while vertical swipes continue scrolling the page. */
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.layout,
+main,
+.subject-header,
+.cards,
+.card {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.formula-block {
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: visible;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  overscroll-behavior-y: auto;
+  touch-action: pan-x pan-y;
+}
+
+.formula-block .katex-display {
+  width: max-content;
+  min-width: 100%;
+  max-width: none;
+}
+
+.formula-block .katex,
+.formula-block .katex-html {
+  max-width: none;
+}
+
+
+
+/* Bottom unified control bar and manual theme toggle overrides */
+header {
+  position: fixed;
+  top: auto;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  border-bottom: 0;
+  border-top: 1px solid var(--border);
+  box-shadow: 0 -14px 36px rgba(0,0,0,.18);
+}
+
+:root[data-theme="light"] header {
+  border-top-color: rgba(255,255,255,.56);
+  border-bottom-color: transparent;
+}
+
+.layout {
+  min-height: 100vh;
+  padding-bottom: 64px;
+}
+
+nav {
+  top: 0;
+  height: calc(100vh - 64px);
+}
+
+main {
+  padding-bottom: 112px;
+}
+
+.theme-toggle {
+  cursor: pointer !important;
+}
+
+@media (min-width: 601px) {
+  .hamburger {
+    display: none !important;
+  }
+}
+
+@media (max-width: 600px) {
+  header {
+    height: 64px;
+    min-height: 64px;
+    padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
+    flex-wrap: nowrap;
+    gap: 10px;
+  }
+
+  header > div:first-child {
+    width: auto;
+    min-width: 0;
+    flex: 0 0 auto;
+    justify-content: flex-start;
+    gap: 8px;
+  }
+
+  .hamburger {
+    width: 32px;
+    height: 32px;
+  }
+
+  .logo {
+    font-size: .96rem;
+    letter-spacing: .02em;
+  }
+
+  .header-actions {
+    width: auto;
+    min-width: 0;
+    flex: 1 1 auto;
+    gap: 8px;
+  }
+
+  .search-wrap {
+    width: auto;
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+
+  .search-icon {
+    display: none;
+  }
+
+  .search-wrap input {
+    height: 38px;
+    padding: 8px 10px;
+    font-size: .82rem;
+  }
+
+  .theme-toggle {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+  }
+
+  .layout {
+    padding-bottom: calc(64px + env(safe-area-inset-bottom));
+  }
+
+  main {
+    padding-bottom: calc(96px + env(safe-area-inset-bottom));
+  }
+}
+
+@media (max-width: 380px) {
+  header {
+    padding-left: 10px;
+    padding-right: 10px;
+    gap: 7px;
+  }
+
+  header > div:first-child {
+    gap: 6px;
+  }
+
+  .hamburger {
+    width: 30px;
+    height: 30px;
+  }
+
+  .logo {
+    font-size: .88rem;
+  }
+
+  .header-actions {
+    gap: 6px;
+  }
+
+  .search-wrap input {
+    height: 36px;
+    padding-left: 9px;
+    padding-right: 9px;
+    font-size: .78rem;
+  }
+
+  .theme-toggle {
+    width: 36px;
+    height: 36px;
+  }
+}
+
+
+/* Mobile compact pop-up subject menu + desktop wheel subject switcher */
+.drawer-overlay {
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.subject-wheel {
+  display: none;
+}
+
+@media (min-width: 601px) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  nav {
+    display: none !important;
+  }
+
+  main {
+    max-width: 1040px;
+    margin: 0 auto;
+    padding-right: 56px;
+    padding-left: 56px;
+  }
+
+  .subject-wheel {
+    position: fixed;
+    right: 22px;
+    bottom: calc(86px + env(safe-area-inset-bottom));
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    z-index: 180;
+    display: block;
+    pointer-events: none;
+  }
+
+  .subject-wheel::before {
+    content: '';
+    position: absolute;
+    inset: 14px;
+    border-radius: 50%;
+    background:
+      radial-gradient(circle at center, var(--surface2) 0 34px, transparent 35px),
+      conic-gradient(from -45deg,
+        rgba(91,141,238,.24) 0deg 90deg,
+        rgba(232,132,91,.24) 90deg 180deg,
+        rgba(91,232,176,.22) 180deg 270deg,
+        rgba(232,91,160,.23) 270deg 360deg);
+    border: 1px solid var(--border);
+    box-shadow: 0 18px 42px rgba(0,0,0,.22);
+    backdrop-filter: blur(18px) saturate(140%);
+    -webkit-backdrop-filter: blur(18px) saturate(140%);
+    transform: rotate(var(--wheel-angle, 0deg));
+    transition: transform .38s cubic-bezier(.2,.7,.2,1);
+  }
+
+  .subject-wheel::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 5px;
+    width: 0;
+    height: 0;
+    border-left: 7px solid transparent;
+    border-right: 7px solid transparent;
+    border-bottom: 11px solid var(--text);
+    transform: translateX(-50%);
+    opacity: .78;
+    z-index: 4;
+    pointer-events: none;
+  }
+
+  :root[data-theme="light"] .subject-wheel::before {
+    background:
+      radial-gradient(circle at center, rgba(255,255,255,.62) 0 34px, transparent 35px),
+      conic-gradient(from -45deg,
+        rgba(91,141,238,.30) 0deg 90deg,
+        rgba(232,132,91,.30) 90deg 180deg,
+        rgba(91,232,176,.28) 180deg 270deg,
+        rgba(232,91,160,.29) 270deg 360deg);
+    border-color: rgba(255,255,255,.62);
+    box-shadow:
+      0 18px 45px var(--shadow-soft),
+      inset 0 1px 0 var(--glass-highlight),
+      inset 0 -1px 0 var(--glass-inset);
+  }
+
+  .wheel-center {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    color: var(--text);
+    font-size: .72rem;
+    letter-spacing: .04em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  .wheel-ring {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    transition: transform .38s cubic-bezier(.2,.7,.2,1);
+    pointer-events: auto;
+    touch-action: none;
+    cursor: grab;
+  }
+
+  .subject-wheel.dragging .wheel-ring {
+    transition: none;
+    cursor: grabbing;
+  }
+
+  .subject-wheel.dragging::before {
+    transition: none;
+  }
+
+  .wheel-item {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 48px;
+    height: 48px;
+    margin: -24px 0 0 -24px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    color: var(--text-muted);
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: .72rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 10px 26px rgba(0,0,0,.18);
+    transition: color .18s, border-color .18s, background .18s, transform .18s;
+  }
+
+  .wheel-item:nth-child(1) { transform: rotate(-90deg) translate(52px) rotate(90deg); }
+  .wheel-item:nth-child(2) { transform: rotate(0deg) translate(52px) rotate(0deg); }
+  .wheel-item:nth-child(3) { transform: rotate(90deg) translate(52px) rotate(-90deg); }
+  .wheel-item:nth-child(4) { transform: rotate(180deg) translate(52px) rotate(-180deg); }
+
+  .wheel-item.top-candidate {
+    color: var(--text);
+    background: var(--surface);
+  }
+
+  .wheel-item:hover,
+  .wheel-item:focus-visible,
+  .wheel-item.active {
+    color: var(--text);
+    border-color: var(--accent);
+    outline: none;
+  }
+
+  .wheel-item[data-target="calculus"].active,
+  .wheel-item[data-target="calculus"]:hover,
+  .wheel-item[data-target="calculus"]:focus-visible { border-color: var(--accent2); }
+  .wheel-item[data-target="physics"].active,
+  .wheel-item[data-target="physics"]:hover,
+  .wheel-item[data-target="physics"]:focus-visible { border-color: var(--accent3); }
+  .wheel-item[data-target="chemistry"].active,
+  .wheel-item[data-target="chemistry"]:hover,
+  .wheel-item[data-target="chemistry"]:focus-visible { border-color: var(--accent4); }
+}
+
+@media (max-width: 900px) and (min-width: 601px) {
+  main {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+}
+
+@media (max-width: 600px) {
+  .drawer-overlay.open {
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+
+  .drawer {
+    top: auto !important;
+    left: 12px !important;
+    bottom: calc(68px + env(safe-area-inset-bottom)) !important;
+    width: 208px !important;
+    max-width: calc(100vw - 24px) !important;
+    height: auto !important;
+    max-height: none !important;
+    padding: 8px !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 16px !important;
+    transform: translateY(10px) scale(.98) !important;
+    opacity: 0;
+    pointer-events: none;
+    overflow: hidden !important;
+    box-shadow: 0 18px 42px rgba(0,0,0,.28);
+    transition: opacity .18s ease, transform .18s ease !important;
+  }
+
+  .drawer.open {
+    transform: translateY(0) scale(1) !important;
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .drawer-section-label {
+    padding: 8px 12px 3px !important;
+    font-size: .62rem;
+  }
+
+  .drawer-item {
+    padding: 9px 12px !important;
+    border-left-width: 0 !important;
+    border-radius: 10px;
+    font-size: .86rem;
+  }
+
+  .drawer-dot {
+    width: 6px;
+    height: 6px;
+  }
+}
+
+
+
+/* Requested refinement: interactive selected-state wheel + formula end padding */
+.formula-block {
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  padding-right: 20px !important;
+  scroll-padding-inline: 20px 2.2ch;
+}
+.formula-block .katex-display {
+  width: max-content !important;
+  min-width: calc(100% - 2.2ch) !important;
+  max-width: none !important;
+  padding-right: 2.2ch !important;
+  box-sizing: content-box !important;
+}
+.formula-block .katex,
+.formula-block .katex-html {
+  white-space: nowrap !important;
+}
+.formula-block > .katex {
+  display: inline-block !important;
+  padding-right: 2.2ch !important;
+  box-sizing: content-box !important;
+}
+@media (min-width: 601px) {
+  .subject-wheel::before {
+    background: var(--wheel-bg) !important;
+    z-index: 0;
+  }
+  .subject-wheel::after {
+    content: '' !important;
+    position: absolute !important;
+    inset: 14px !important;
+    width: auto !important;
+    height: auto !important;
+    border: 0 !important;
+    border-radius: 50% !important;
+    background: var(--wheel-highlight, transparent) !important;
+    transform: rotate(var(--wheel-angle, 0deg)) !important;
+    opacity: 0 !important;
+    filter: drop-shadow(0 0 16px rgba(255,255,255,.28));
+    pointer-events: none !important;
+    z-index: 1 !important;
+    transition: opacity .18s, transform .12s linear !important;
+  }
+  .subject-wheel.dragging::after {
+    opacity: 1 !important;
+  }
+  .subject-wheel.selected::after {
+    opacity: 0 !important;
+  }
+  .subject-wheel.selected .wheel-center {
+    background: var(--wheel-center-bg, var(--surface2)) !important;
+    border-color: var(--wheel-center-border, var(--border)) !important;
+    color: var(--text) !important;
+    box-shadow:
+      0 0 0 1px rgba(255,255,255,.10) inset,
+      0 12px 28px rgba(0,0,0,.24),
+      0 0 24px var(--wheel-center-glow, rgba(91,141,238,.22));
+    font-weight: 600;
+  }
+  .subject-wheel.selected .wheel-item.active {
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+  .subject-wheel.selected .wheel-item:not(.active) {
+    opacity: 1;
+  }
+  .subject-wheel.dragging .wheel-item {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+  }
+  .subject-wheel.dragging .wheel-center {
+    background: var(--surface2) !important;
+    border-color: var(--border) !important;
+    box-shadow: 0 10px 24px rgba(0,0,0,.18);
+  }
+}
+
+
+
+/* Final refinement: balanced formula padding + fixed-center rotating wheel */
+.formula-block {
+  padding-left: 20px !important;
+  padding-right: 20px !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  scroll-padding-inline: 20px 20px !important;
+  box-sizing: border-box !important;
+}
+.formula-block .katex-display {
+  width: max-content !important;
+  min-width: 100% !important;
+  max-width: none !important;
+  padding-right: 0 !important;
+  box-sizing: border-box !important;
+}
+.formula-block .katex-display::after {
+  content: '';
+  display: inline-block;
+  width: 20px;
+  height: 1px;
+  flex: 0 0 auto;
+}
+.formula-block > .katex {
+  display: inline-block !important;
+  padding-right: 20px !important;
+  box-sizing: content-box !important;
+}
+@media (max-width: 600px) {
+  .formula-block {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+    scroll-padding-inline: 16px 16px !important;
+  }
+  .formula-block .katex-display::after,
+  .formula-block > .katex {
+    padding-right: 16px !important;
+  }
+}
+@media (min-width: 601px) {
+  .subject-wheel::after {
+    display: none !important;
+  }
+  .subject-wheel::before {
+    background: var(--wheel-bg) !important;
+    transform: none !important;
+    transition: background .2s ease !important;
+  }
+  .subject-wheel .wheel-center {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%) !important;
+    z-index: 4 !important;
+  }
+  .subject-wheel .wheel-ring {
+    transform: none !important;
+    z-index: 3 !important;
+  }
+  .subject-wheel .wheel-item {
+    transform-origin: center center !important;
+    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease, opacity .15s ease !important;
+  }
+  .subject-wheel.dragging .wheel-center {
+    transform: translate(-50%, -50%) !important;
+  }
+  .subject-wheel .wheel-item.top-candidate {
+    box-shadow: 0 0 0 1px rgba(255,255,255,.35) inset, 0 0 22px currentColor !important;
+    border-color: currentColor !important;
+  }
+}
+
+
+/* Wheel refinement: slower rotation, centered labels, protected center disk */
+@media (min-width: 601px) {
+  .subject-wheel::before {
+    background: var(--wheel-bg) !important;
+    border-radius: 50%;
+  }
+
+  .subject-wheel .wheel-center {
+    width: 60px !important;
+    height: 60px !important;
+    z-index: 6 !important;
+    background: var(--wheel-center-bg, var(--surface2)) !important;
+    box-shadow:
+      0 0 0 1px var(--wheel-center-border, var(--border)),
+      0 10px 24px rgba(0,0,0,.18),
+      0 0 24px var(--wheel-center-glow, rgba(91,141,238,.20)) !important;
+  }
+
+  .subject-wheel .wheel-ring {
+    z-index: 5 !important;
+  }
+
+  .subject-wheel .wheel-item {
+    width: 42px !important;
+    height: 42px !important;
+    margin: -21px 0 0 -21px !important;
+    font-size: .68rem !important;
+    z-index: 7 !important;
+    transition: transform .28s cubic-bezier(.18,.68,.22,1), box-shadow .18s ease, border-color .18s ease, opacity .15s ease !important;
+  }
+
+  .subject-wheel.dragging .wheel-item {
+    transition: box-shadow .12s ease, border-color .12s ease, opacity .12s ease !important;
+  }
+}
+
+
+/* Wheel v2: matched subject colors, ring-only sectors, centered labels */
+@media (min-width: 601px) {
+  .subject-wheel {
+    width: 156px !important;
+    height: 156px !important;
+  }
+
+  .subject-wheel::before {
+    inset: 10px !important;
+    background: var(--wheel-ring-gradient) !important;
+    border: 1px solid var(--border) !important;
+    box-shadow:
+      0 18px 42px rgba(0,0,0,.22),
+      inset 0 0 0 1px rgba(255,255,255,.08) !important;
+    backdrop-filter: blur(18px) saturate(140%);
+    -webkit-backdrop-filter: blur(18px) saturate(140%);
+    -webkit-mask: radial-gradient(circle at center, transparent 0 49px, #000 50px 68px, transparent 69px);
+    mask: radial-gradient(circle at center, transparent 0 49px, #000 50px 68px, transparent 69px);
+  }
+
+  .subject-wheel .wheel-center {
+    width: 62px !important;
+    height: 62px !important;
+    z-index: 8 !important;
+  }
+
+  .subject-wheel .wheel-item {
+    width: 44px !important;
+    height: 44px !important;
+    margin: -22px 0 0 -22px !important;
+    background: var(--surface2) !important;
+  }
+
+  .wheel-item[data-target="algebra"] {
+    color: var(--accent) !important;
+    border-color: rgba(91,141,238,.72) !important;
+    box-shadow: 0 10px 24px rgba(91,141,238,.16) !important;
+  }
+  .wheel-item[data-target="calculus"] {
+    color: var(--accent2) !important;
+    border-color: rgba(232,132,91,.72) !important;
+    box-shadow: 0 10px 24px rgba(232,132,91,.16) !important;
+  }
+  .wheel-item[data-target="physics"] {
+    color: var(--accent3) !important;
+    border-color: rgba(91,232,176,.70) !important;
+    box-shadow: 0 10px 24px rgba(91,232,176,.14) !important;
+  }
+  .wheel-item[data-target="chemistry"] {
+    color: var(--accent4) !important;
+    border-color: rgba(232,91,160,.72) !important;
+    box-shadow: 0 10px 24px rgba(232,91,160,.15) !important;
+  }
+
+  .subject-wheel .wheel-item.top-candidate {
+    background: var(--surface) !important;
+    box-shadow:
+      0 0 0 1px currentColor inset,
+      0 0 20px currentColor,
+      0 12px 26px rgba(0,0,0,.20) !important;
+  }
+
+  :root[data-theme="light"] .subject-wheel::before {
+    border-color: rgba(255,255,255,.68) !important;
+    box-shadow:
+      0 18px 45px var(--shadow-soft),
+      inset 0 1px 0 var(--glass-highlight),
+      inset 0 -1px 0 var(--glass-inset) !important;
+  }
+}
+
+</style>
+</head>
+<body>
+<div class="drawer-overlay" id="drawerOverlay"></div>
+
+<div class="drawer" id="drawer" aria-label="과목 메뉴">
+<div class="drawer-section-label">수학</div>
+<div class="drawer-item active" data-target="algebra"><span class="drawer-dot" style="background:var(--accent)"></span>대수</div>
+<div class="drawer-item" data-target="calculus"><span class="drawer-dot" style="background:var(--accent2)"></span>미적분 I</div>
+<div class="drawer-section-label">과학</div>
+<div class="drawer-item" data-target="physics"><span class="drawer-dot" style="background:var(--accent3)"></span>물리학</div>
+<div class="drawer-item" data-target="chemistry"><span class="drawer-dot" style="background:var(--accent4)"></span>화학</div>
+</div>
+
+<header>
+<div style="display:flex;align-items:center;gap:14px;">
+<div class="hamburger" id="hamburger" role="button" tabindex="0" aria-label="메뉴 열기" aria-expanded="false"><span></span><span></span><span></span></div>
+<div class="logo">수식<span>·</span>사전</div>
+</div>
+<div class="header-actions">
+<div class="search-wrap">
+<span class="search-icon">⌕</span>
+<input type="text" id="searchInput" placeholder="공식 검색..." autocomplete="off">
+</div>
+<button type="button" class="theme-toggle" id="themeToggle" aria-label="테마 전환" aria-pressed="false" title="라이트/다크 모드 전환">
+<span class="theme-icon" aria-hidden="true">☀</span>
+</button>
+</div>
+</header>
+
+
+<div class="subject-wheel" id="subjectWheel" aria-label="과목 전환 휠">
+  <div class="wheel-center" aria-hidden="true">과목</div>
+  <div class="wheel-ring">
+    <button type="button" class="wheel-item active" data-target="algebra">대수</button>
+    <button type="button" class="wheel-item" data-target="calculus">미적분</button>
+    <button type="button" class="wheel-item" data-target="physics">물리</button>
+    <button type="button" class="wheel-item" data-target="chemistry">화학</button>
+  </div>
+</div>
+
+<div class="layout">
+<nav aria-label="과목 선택">
+<div class="nav-section">
+<div class="nav-label">수학</div>
+<div class="nav-item active" data-target="algebra"><span class="nav-dot" style="background:var(--accent)"></span>대수</div>
+<div class="nav-item" data-target="calculus"><span class="nav-dot" style="background:var(--accent2)"></span>미적분 I</div>
+</div>
+<div class="nav-section">
+<div class="nav-label">과학</div>
+<div class="nav-item" data-target="physics"><span class="nav-dot" style="background:var(--accent3)"></span>물리학</div>
+<div class="nav-item" data-target="chemistry"><span class="nav-dot" style="background:var(--accent4)"></span>화학</div>
+</div>
+</nav>
+
+<main>
+<div id="search-results"></div>
+
+<section id="algebra" class="subject-header visible" data-subject="algebra">
+<div class="subject-title">대수</div>
+<div class="subject-desc">2022 개정 교육과정 — 일반선택 &lt;대수&gt; (구 수학Ⅰ)</div>
+<div class="cards">
+<div class="card" data-search="지수 법칙 거듭제곱 지수함수">
+<div class="card-name">지수법칙</div>
+<div class="formula-block"><div class="formula-label">기본 연산</div>\[a^m a^n=a^{m+n},\quad \frac{a^m}{a^n}=a^{m-n},\quad (a^m)^n=a^{mn}\]</div>
+<div class="formula-block"><div class="formula-label">유리·무리 지수</div>\[a^{\frac{m}{n}}=\sqrt[n]{a^m}\quad (a>0)\]</div>
+</div>
+<div class="card" data-search="로그 logarithm 정의 성질 밑변환">
+<div class="card-name">로그의 정의와 성질</div>
+<div class="formula-block"><div class="formula-label">정의</div>\[a^x=N \iff x=\log_a N\quad (a>0,\ a\ne1,\ N>0)\]</div>
+<div class="formula-block"><div class="formula-label">성질</div>\[\log_a MN=\log_a M+\log_a N,\quad \log_a\frac{M}{N}=\log_aM-\log_aN\]</div>
+<div class="formula-block"><div class="formula-label">밑변환 공식</div>\[\log_a b=\frac{\log_c b}{\log_c a}\]</div>
+</div>
+<div class="card" data-search="삼각함수 sin cos tan 정의 단위원">
+<div class="card-name">삼각함수 기본 정의</div>
+<div class="formula-block"><div class="formula-label">피타고라스 항등식</div>\[\sin^2\theta+\cos^2\theta=1\]</div>
+</div>
+<div class="card" data-search="삼각함수 그래프 주기 진폭">
+<div class="card-name">삼각함수의 그래프</div>
+<div class="formula-block"><div class="formula-label">일반형</div>\[y=A\sin B(x-C)+D\]</div>
+<div class="formula-block"><div class="formula-label">기본 주기</div>\[\sin x,\cos x:2\pi,\quad \tan x:\pi\]</div>
+</div>
+<div class="card" data-search="등차수열 공차 일반항 합">
+<div class="card-name">등차수열</div>
+<div class="formula-block"><div class="formula-label">일반항</div>\[a_n=a_1+(n-1)d\]</div>
+<div class="formula-block"><div class="formula-label">합</div>\[S_n=\frac{n(a_1+a_n)}{2}=\frac{n\{2a_1+(n-1)d\}}{2}\]</div>
+</div>
+<div class="card" data-search="등비수열 공비 일반항 합 geometric">
+<div class="card-name">등비수열</div>
+<div class="formula-block"><div class="formula-label">일반항</div>\[a_n=a_1r^{n-1}\]</div>
+<div class="formula-block"><div class="formula-label">합</div>\[S_n=\frac{a_1(r^n-1)}{r-1}\quad(r\ne1)\]</div>
+</div>
+<div class="card" data-search="시그마 합공식 수열의 합">
+<div class="card-name">시그마 합공식</div>
+<div class="formula-block">\[\sum_{k=1}^{n}k=\frac{n(n+1)}{2},\quad \sum_{k=1}^{n}k^2=\frac{n(n+1)(2n+1)}{6},\quad \sum_{k=1}^{n}k^3=\left\{\frac{n(n+1)}{2}\right\}^2\]</div>
+</div>
+<div class="card" data-search="수학적 귀납법 점화식">
+<div class="card-name">수학적 귀납법</div>
+<div class="formula-block">\[P(1)\text{ 참},\quad P(k)\Rightarrow P(k+1)\text{ 참}\Rightarrow P(n)\text{ 참}\]</div>
+<div class="formula-block"><div class="formula-label">대표 점화식</div>\[a_{n+1}=a_n+d\Rightarrow a_n=a_1+(n-1)d\]\[a_{n+1}=ra_n\Rightarrow a_n=a_1r^{n-1}\]</div>
+</div>
+</div>
+</section>
+
+<section id="calculus" class="subject-header" data-subject="calculus">
+<div class="subject-title">미적분Ⅰ</div>
+<div class="subject-desc">2022 개정 교육과정 — 일반선택 &lt;미적분Ⅰ&gt; (구 수학Ⅱ)</div>
+<div class="cards">
+<div class="card" data-search="극한 limit 수렴 발산 함수"><div class="card-name">함수의 극한 기본 성질</div><div class="formula-block">\[\lim_{x\to a}\{f(x)\pm g(x)\}=\lim_{x\to a}f(x)\pm\lim_{x\to a}g(x)\]\[\lim_{x\to a}cf(x)=c\lim_{x\to a}f(x)\]</div></div>
+<div class="card" data-search="극한 부정형 인수분해 유리화 최고차항"><div class="card-name">부정형 극한 처리</div><div class="formula-block"><div class="formula-label">0/0형 — 인수분해·유리화 후 약분</div>\[\frac{x^2-a^2}{x-a}=x+a\quad(x\ne a)\]</div><div class="formula-block"><div class="formula-label">∞/∞형 — 최고차항으로 나눔</div>\[\lim_{x\to\infty}\frac{a_nx^n+\cdots}{b_nx^n+\cdots}=\frac{a_n}{b_n}\]</div></div>
+<div class="card" data-search="연속 함수 연속 조건 불연속"><div class="card-name">함수의 연속 조건</div><div class="formula-block">\[\lim_{x\to a}f(x)=f(a)\]</div></div>
+<div class="card" data-search="미분 도함수 정의 derivative"><div class="card-name">미분계수와 도함수</div><div class="formula-block"><div class="formula-label">미분계수</div>\[f'(a)=\lim_{h\to0}\frac{f(a+h)-f(a)}{h}\]</div><div class="formula-block"><div class="formula-label">다항함수 미분 공식</div>\[(x^n)'=nx^{n-1},\quad (cf)'=cf',\quad (f\pm g)'=f'\pm g'\]</div></div>
+<div class="card" data-search="접선 기울기 방정식"><div class="card-name">접선의 방정식</div><div class="formula-block">\[y-f(a)=f'(a)(x-a)\]</div></div>
+<div class="card" data-search="극대 극소 극값 증감표"><div class="card-name">극값과 증감</div><div class="formula-block">\[f'(x)>0:\text{ 증가},\quad f'(x)<0:\text{ 감소}\]</div><div class="formula-block"><div class="formula-label">2차 도함수 판별</div>\[f'(a)=0,\ f''(a)>0:\text{ 극소},\quad f''(a)<0:\text{ 극대}\]</div></div>
+<div class="card" data-search="부정적분 integral 역도함수"><div class="card-name">부정적분</div><div class="formula-block">\[\int x^n dx=\frac{x^{n+1}}{n+1}+C\quad(n\ne-1)\]</div></div>
+<div class="card" data-search="정적분 기본정리 함수"><div class="card-name">정적분</div><div class="formula-block"><div class="formula-label">미적분학의 기본 정리</div>\[\int_a^b f(x)dx=F(b)-F(a)\quad(F'=f)\]</div></div>
+<div class="card" data-search="정적분 성질 넓이 두 곡선"><div class="card-name">정적분의 성질 · 넓이</div><div class="formula-block">\[\int_a^b f(x)dx=-\int_b^a f(x)dx,\quad \int_a^a f(x)dx=0\]</div><div class="formula-block"><div class="formula-label">두 곡선 사이 넓이</div>\[A=\int_a^b |f(x)-g(x)|dx\]</div></div>
+<div class="card" data-search="속도 위치 거리 적분 이동거리"><div class="card-name">속도·위치와 적분</div><div class="formula-block">\[v(t)=s'(t),\quad s(t)=s(0)+\int_0^t v(u)du,\quad \text{이동거리}=\int_a^b |v(t)|dt\]</div></div>
+</div>
+</section>
+
+<section id="physics" class="subject-header" data-subject="physics">
+<div class="subject-title">물리학</div>
+<div class="subject-desc">2022 개정 교육과정 — 일반선택 &lt;물리학&gt; (힘과 에너지 · 전기와 자기 · 빛과 물질)</div>
+<div class="cards">
+<div class="card" data-search="뉴턴 운동법칙 힘 가속도 관성"><div class="card-name">뉴턴의 운동 법칙</div><div class="formula-block"><div class="formula-label">제2법칙</div>\[\sum \vec F=m\vec a\]</div><div class="formula-block"><div class="formula-label">제3법칙</div>\[\vec F_{AB}=-\vec F_{BA}\]</div></div>
+<div class="card" data-search="등가속도 운동 공식 kinematic"><div class="card-name">등가속도 운동</div><div class="formula-block">\[v=v_0+at,\quad s=v_0t+\frac12at^2,\quad v^2-v_0^2=2as\]</div></div>
+<div class="card" data-search="일 에너지 운동에너지 퍼텐셜 보존"><div class="card-name">일·에너지 정리</div><div class="formula-block">\[W=Fs,\quad W=\Delta K,\quad K=\frac12mv^2\]</div><div class="formula-block"><div class="formula-label">역학적 에너지 보존</div>\[K+U=\text{constant}\]</div></div>
+<div class="card" data-search="운동량 충격량 보존 충돌"><div class="card-name">운동량과 충격량</div><div class="formula-block">\[\vec p=m\vec v,\quad \vec I=\vec F\Delta t=\Delta\vec p\]</div><div class="formula-block"><div class="formula-label">운동량 보존</div>\[\sum \vec p_{\text{before}}=\sum \vec p_{\text{after}}\]</div></div>
+<div class="card" data-search="열역학 내부에너지 열역학 제1법칙 기체 일"><div class="card-name">열과 내부에너지</div><div class="formula-block"><div class="formula-label">열역학 제1법칙</div>\[\Delta U=Q-W\]</div><div class="formula-block"><div class="formula-label">등압 과정에서 기체가 한 일</div>\[W=P\Delta V\]</div></div>
+<div class="card" data-search="쿨롱 전기력 전기장 전위 전기력"><div class="card-name">전기력과 전기장</div><div class="formula-block"><div class="formula-label">쿨롱 법칙</div>\[F=k\frac{|q_1q_2|}{r^2}\]</div><div class="formula-block"><div class="formula-label">전기장 세기</div>\[\vec E=\frac{\vec F}{q}\]</div><div class="formula-block"><div class="formula-label">전기력이 하는 일</div>\[W=q\Delta V\]</div></div>
+<div class="card" data-search="전류 저항 옴 법칙 전력 전기에너지 회로"><div class="card-name">전류·저항·전력</div><div class="formula-block">\[V=IR,\quad I=\frac{Q}{t}\]</div><div class="formula-block"><div class="formula-label">전력과 전기에너지</div>\[P=VI=I^2R=\frac{V^2}{R},\quad E=Pt\]</div></div>
+<div class="card" data-search="자기장 전자기유도 패러데이 유도 기전력"><div class="card-name">전자기 유도</div><div class="formula-block"><div class="formula-label">패러데이 법칙</div>\[\mathcal{E}=-N\frac{\Delta\Phi}{\Delta t}\]</div></div>
+<div class="card" data-search="광전효과 광자 플랑크 빛의 이중성"><div class="card-name">빛의 이중성 · 광전효과</div><div class="formula-block"><div class="formula-label">광자 에너지</div>\[E=hf=\frac{hc}{\lambda}\]</div><div class="formula-block"><div class="formula-label">광전효과</div>\[K_{\max}=hf-W_0\]</div></div>
+<div class="card" data-search="드브로이 물질파 보어 에너지 준위 반도체"><div class="card-name">물질의 이중성과 원자 모형</div><div class="formula-block"><div class="formula-label">드 브로이 파장</div>\[\lambda=\frac{h}{p}\]</div><div class="formula-block"><div class="formula-label">보어 수소 에너지 준위</div>\[E_n=-\frac{13.6\ \mathrm{eV}}{n^2}\]</div></div>
+</div>
+</section>
+
+<section id="chemistry" class="subject-header" data-subject="chemistry">
+<div class="subject-title">화학</div>
+<div class="subject-desc">2022 개정 교육과정 — 일반선택 &lt;화학&gt; (화학의 언어 · 화학 결합 · 화학 반응 · 산염기)</div>
+<div class="cards">
+<div class="card" data-search="몰 아보가드로 분자량 mol"><div class="card-name">몰(mol)과 아보가드로 수</div><div class="formula-block">\[n=\frac{m}{M},\quad N=nN_A\]<div class="note">\(N_A=6.02\times10^{23}\ \mathrm{mol}^{-1}\) (아보가드로 수)</div></div></div>
+<div class="card" data-search="화학반응식 양적관계 몰비 계수 한계반응물"><div class="card-name">화학 반응식과 양적 관계</div><div class="formula-block"><div class="formula-label">계수비 = 몰수비 = 기체 부피비</div>\[aA+bB\to cC+dD\Rightarrow n_A:n_B:n_C:n_D=a:b:c:d\]</div><div class="formula-block"><div class="formula-label">한계 반응물</div>\[\text{반응 가능 횟수}=\frac{\text{현재 몰수}}{\text{반응식 계수}}\]<div class="note">각 반응물마다 이 값을 계산했을 때 가장 작은 값의 반응물이 먼저 모두 소모된다. 그 반응물이 한계 반응물이다.</div></div></div>
+<div class="card" data-search="농도 몰농도 퍼센트 용액"><div class="card-name">농도 계산</div><div class="formula-block"><div class="formula-label">몰농도</div>\[M=\frac{n}{V(\mathrm L)}\]</div><div class="formula-block"><div class="formula-label">퍼센트 농도</div>\[\%\text{농도}=\frac{\text{용질의 질량}}{\text{용액의 질량}}\times100\]</div><div class="formula-block"><div class="formula-label">퍼센트 → 몰농도</div>\[M=\frac{10\times d\times w}{M_r}\]<div class="note">\(d\): 용액의 밀도(g/mL), \(w\): 퍼센트 농도(%), \(M_r\): 용질의 몰질량(g/mol). 1 L 용액의 질량을 밀도로 구한 뒤, 그중 \(w\%\)만큼이 용질이라고 보고 몰수로 바꾸는 식이다.</div></div></div>
+<div class="card" data-search="VSEPR 분자구조 극성 굽은 직선 사면체"><div class="card-name">분자 구조 (VSEPR)</div><div class="formula-block">\[\text{전자쌍 반발 최소}\Rightarrow \text{분자 구조 결정}\]</div><div class="formula-block"><div class="formula-label">대표 구조</div>\[\mathrm{CO_2}:\text{직선형},\quad \mathrm{H_2O}:\text{굽은형},\quad \mathrm{CH_4}:\text{정사면체}\]</div></div>
+<div class="card" data-search="화학평형 르샤틀리에 평형상수 K"><div class="card-name">화학 평형</div><div class="formula-block">\[aA+bB\rightleftharpoons cC+dD,\quad K=\frac{[C]^c[D]^d}{[A]^a[B]^b}\]</div><div class="formula-block"><div class="formula-label">르샤틀리에 원리</div><div class="note">평형 상태에 변화가 가해지면 그 변화를 줄이는 방향으로 평형이 이동한다.</div></div></div>
+<div class="card" data-search="산 염기 pH 이온화"><div class="card-name">산·염기와 pH</div><div class="formula-block"><div class="formula-label">pH</div>\[\mathrm{pH}=-\log[H^+]\]</div><div class="formula-block"><div class="formula-label">물의 이온곱</div>\[K_w=[H^+][OH^-]=1.0\times10^{-14}\quad(25^\circ\mathrm C)\]</div></div>
+<div class="card" data-search="중화반응 적정 당량점 NV"><div class="card-name">중화 반응과 적정</div><div class="formula-block">\[H^+ + OH^- \to H_2O\]</div><div class="formula-block"><div class="formula-label">중화 적정</div>\[M_aV_a n_a=M_bV_b n_b\]</div></div>
+</div>
+</section>
+</main>
+</div>
+
+<script>
+const KATEX_OPTS = {
+  delimiters: [
+    { left: '$$', right: '$$', display: true },
+    { left: '\\[', right: '\\]', display: true },
+    { left: '\\(', right: '\\)', display: false }
+  ],
+  throwOnError: false
+};
+
+function renderKatex(el) {
+  if (window.renderMathInElement) renderMathInElement(el, KATEX_OPTS);
+}
+
+function escapeHTML(value) {
+  return String(value).replace(/[&<>'"]/g, char => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+  }[char]));
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const themeToggle = document.getElementById('themeToggle');
+  const themeIcon = themeToggle ? themeToggle.querySelector('.theme-icon') : null;
+  const themeMedia = window.matchMedia ? window.matchMedia('(prefers-color-scheme: light)') : null;
+
+  function getStoredTheme() {
+    try { return localStorage.getItem('formulaTheme'); } catch (e) { return null; }
+  }
+
+  function setStoredTheme(value) {
+    try { localStorage.setItem('formulaTheme', value); } catch (e) {}
+  }
+
+  function getSystemTheme() {
+    return themeMedia && themeMedia.matches ? 'light' : 'dark';
+  }
+
+  function applyTheme(theme) {
+    const nextTheme = theme || getStoredTheme() || getSystemTheme();
+    const isLight = nextTheme === 'light';
+    document.documentElement.dataset.theme = nextTheme;
+    if (themeToggle && themeIcon) {
+      themeIcon.textContent = isLight ? '☀' : '☾';
+      themeToggle.setAttribute('aria-label', isLight ? '다크 모드로 전환' : '라이트 모드로 전환');
+      themeToggle.setAttribute('aria-pressed', String(isLight));
+      themeToggle.title = isLight ? '다크 모드로 전환' : '라이트 모드로 전환';
+    }
+  }
+
+  applyTheme();
+  if (themeMedia) {
+    const syncSystemTheme = () => {
+      if (!getStoredTheme()) applyTheme(getSystemTheme());
+    };
+    if (themeMedia.addEventListener) {
+      themeMedia.addEventListener('change', syncSystemTheme);
+    } else if (themeMedia.addListener) {
+      themeMedia.addListener(syncSystemTheme);
+    }
+  }
+
+  if (themeToggle) {
+    themeToggle.addEventListener('click', () => {
+      const current = document.documentElement.dataset.theme === 'light' ? 'light' : 'dark';
+      const next = current === 'light' ? 'dark' : 'light';
+      setStoredTheme(next);
+      applyTheme(next);
+    });
+  }
+
+  const cleanCardsCache = Array.from(document.querySelectorAll('.card')).map(card => ({
+    subject: card.closest('[data-subject]').dataset.subject,
+    keywords: (card.dataset.search || '').toLowerCase(),
+    textContent: card.textContent.toLowerCase(),
+    savedInnerHTML: card.innerHTML
+  }));
+
+  renderKatex(document.body);
+
+  const hamburger = document.getElementById('hamburger');
+  const drawer = document.getElementById('drawer');
+  const drawerOverlay = document.getElementById('drawerOverlay');
+  const drawerItems = document.querySelectorAll('.drawer-item');
+  const navItems = document.querySelectorAll('.nav-item');
+  const wheelItems = document.querySelectorAll('.wheel-item');
+  const sections = document.querySelectorAll('.subject-header');
+  const searchInput = document.getElementById('searchInput');
+  const searchResults = document.getElementById('search-results');
+  let activeId = 'algebra';
+
+  function openDrawer() {
+    hamburger.classList.add('open');
+    drawer.classList.add('open');
+    drawerOverlay.classList.add('open');
+    hamburger.setAttribute('aria-expanded', 'true');
+  }
+
+  function closeDrawer() {
+    hamburger.classList.remove('open');
+    drawer.classList.remove('open');
+    drawerOverlay.classList.remove('open');
+    hamburger.setAttribute('aria-expanded', 'false');
+  }
+
+  function toggleDrawer() {
+    drawer.classList.contains('open') ? closeDrawer() : openDrawer();
+  }
+
+  hamburger.addEventListener('click', toggleDrawer);
+  hamburger.addEventListener('keydown', event => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      toggleDrawer();
+    }
+  });
+  drawerOverlay.addEventListener('click', closeDrawer);
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape') closeDrawer();
+  });
+
+  function switchTab(targetId) {
+    const target = document.getElementById(targetId);
+    if (!target) return;
+
+    activeId = targetId;
+    navItems.forEach(n => n.classList.toggle('active', n.dataset.target === targetId));
+    drawerItems.forEach(n => n.classList.toggle('active', n.dataset.target === targetId));
+    wheelItems.forEach(n => n.classList.toggle('active', n.dataset.target === targetId));
+    sections.forEach(s => s.classList.remove('visible'));
+    target.classList.add('visible');
+
+    searchInput.value = '';
+    searchResults.classList.remove('visible');
+    searchResults.innerHTML = '';
+  }
+
+  navItems.forEach(item => item.addEventListener('click', () => switchTab(item.dataset.target)));
+
+  const subjectWheel = document.getElementById('subjectWheel');
+  const wheelRing = subjectWheel ? subjectWheel.querySelector('.wheel-ring') : null;
+  const wheelTargets = ['algebra', 'calculus', 'physics', 'chemistry'];
+  const wheelNames = { algebra: '대수', calculus: '미적분', physics: '물리', chemistry: '화학' };
+  const wheelColors = {
+    algebra: { soft: 'rgba(91,141,238,.30)', strong: 'rgba(91,141,238,.60)', center: 'rgba(91,141,238,.34)', glow: 'rgba(91,141,238,.34)', border: 'rgba(91,141,238,.72)' },
+    calculus: { soft: 'rgba(232,132,91,.30)', strong: 'rgba(232,132,91,.60)', center: 'rgba(232,132,91,.34)', glow: 'rgba(232,132,91,.34)', border: 'rgba(232,132,91,.72)' },
+    physics: { soft: 'rgba(91,232,176,.28)', strong: 'rgba(91,232,176,.58)', center: 'rgba(91,232,176,.30)', glow: 'rgba(91,232,176,.32)', border: 'rgba(91,232,176,.70)' },
+    chemistry: { soft: 'rgba(232,91,160,.29)', strong: 'rgba(232,91,160,.60)', center: 'rgba(232,91,160,.32)', glow: 'rgba(232,91,160,.34)', border: 'rgba(232,91,160,.72)' }
+  };
+
+  let wheelRotation = 0;
+  let wheelDragging = false;
+  let wheelPointerId = null;
+  let wheelStartPointerAngle = 0;
+  let wheelStartRotation = 0;
+  let wheelStartX = 0;
+  let wheelStartY = 0;
+  let wheelMoved = false;
+  let wheelLastPointerAngle = 0;
+  const WHEEL_ROTATION_SENSITIVITY = 1;
+  const WHEEL_LABEL_RADIUS = 56;
+
+  function normalizeAngle(angle) {
+    return ((angle + 180) % 360 + 360) % 360 - 180;
+  }
+
+  function angleFromCenter(event) {
+    const rect = subjectWheel.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    return Math.atan2(event.clientY - cy, event.clientX - cx) * 180 / Math.PI;
+  }
+
+  function restTargets(centerTarget = activeId) {
+    return wheelTargets.filter(target => target !== centerTarget);
+  }
+
+  function outerBaseAngleForIndex(index) {
+    return [-90, 30, 150][index % 3];
+  }
+
+  function topTargetFromOuterRotation(rotation = wheelRotation, centerTarget = activeId) {
+    const rest = restTargets(centerTarget);
+    let selected = rest[0] || centerTarget;
+    let minDistance = Infinity;
+    rest.forEach((target, index) => {
+      const distance = Math.abs(normalizeAngle(outerBaseAngleForIndex(index) + rotation + 90));
+      if (distance < minDistance) {
+        minDistance = distance;
+        selected = target;
+      }
+    });
+    return selected;
+  }
+
+  function ringGradient(centerTarget = activeId, candidate = null, rotation = wheelRotation) {
+    const rest = restTargets(centerTarget);
+    const sector = 120;
+    // CSS conic-gradient의 0deg는 위쪽이고, wheel-item의 -90deg가 위쪽입니다.
+    // 따라서 시작각을 rotation - 60deg로 두면 각 120deg 도넛 조각의 중앙이
+    // 과목명 원의 현재 위치와 정확히 일치합니다.
+    const startOffset = rotation - 60;
+    const stops = rest.map((target, index) => {
+      const start = index * sector;
+      const end = start + sector;
+      const color = target === candidate ? wheelColors[target].strong : wheelColors[target].soft;
+      return `${color} ${start}deg ${end}deg`;
+    }).join(', ');
+    return `conic-gradient(from ${startOffset}deg, ${stops})`;
+  }
+
+  function setWheelThemeFor(target) {
+    if (!subjectWheel) return;
+    const color = wheelColors[target] || wheelColors.algebra;
+    subjectWheel.style.setProperty('--wheel-center-bg', color.center);
+    subjectWheel.style.setProperty('--wheel-center-glow', color.glow);
+    subjectWheel.style.setProperty('--wheel-center-border', color.border);
+  }
+
+  function renderWheel(rotation = wheelRotation, candidate = null) {
+    if (!subjectWheel || !wheelRing) return;
+    const centerTarget = activeId;
+    const highlighted = candidate || (wheelDragging ? topTargetFromOuterRotation(rotation, centerTarget) : null);
+    const center = subjectWheel.querySelector('.wheel-center');
+
+    subjectWheel.classList.add('selected');
+    subjectWheel.classList.toggle('dragging', wheelDragging);
+    subjectWheel.style.setProperty('--wheel-ring-gradient', ringGradient(centerTarget, highlighted, rotation));
+    subjectWheel.style.setProperty('--wheel-angle', rotation + 'deg');
+    wheelRing.style.transform = 'none';
+
+    setWheelThemeFor(centerTarget);
+    if (center) center.textContent = wheelNames[centerTarget] || '과목';
+
+    const rest = restTargets(centerTarget);
+    wheelItems.forEach(item => {
+      const target = item.dataset.target;
+      const isCenter = target === centerTarget;
+      const color = wheelColors[target] || wheelColors.algebra;
+      item.style.borderColor = color.border;
+      item.style.color = color.border;
+      item.classList.toggle('active', isCenter);
+      item.classList.toggle('top-candidate', target === highlighted);
+
+      if (isCenter) {
+        item.style.opacity = '0';
+        item.style.pointerEvents = 'none';
+        item.style.transform = 'translate(-50%, -50%) scale(.45)';
+        return;
+      }
+
+      const index = rest.indexOf(target);
+      const angle = outerBaseAngleForIndex(index) + rotation;
+      item.style.opacity = '1';
+      item.style.pointerEvents = 'auto';
+      item.style.transform = 'rotate(' + angle + 'deg) translate(' + WHEEL_LABEL_RADIUS + 'px) rotate(' + (-angle) + 'deg)';
+    });
+  }
+
+  function switchTabFromWheel(targetId) {
+    switchTab(targetId);
+    wheelRotation = 0;
+    wheelDragging = false;
+    renderWheel(0, null);
+  }
+
+  if (subjectWheel && wheelRing) {
+    renderWheel(0, null);
+
+    wheelRing.addEventListener('pointerdown', event => {
+      if (window.matchMedia('(max-width: 600px)').matches) return;
+      wheelDragging = true;
+      wheelPointerId = event.pointerId;
+      wheelStartPointerAngle = angleFromCenter(event);
+      wheelLastPointerAngle = wheelStartPointerAngle;
+      wheelStartRotation = wheelRotation;
+      wheelStartX = event.clientX;
+      wheelStartY = event.clientY;
+      wheelMoved = false;
+      const candidate = topTargetFromOuterRotation(wheelRotation, activeId);
+      renderWheel(wheelRotation, candidate);
+      wheelRing.setPointerCapture(event.pointerId);
+      event.preventDefault();
+    });
+
+    wheelRing.addEventListener('pointermove', event => {
+      if (!wheelDragging || event.pointerId !== wheelPointerId) return;
+      const dx = event.clientX - wheelStartX;
+      const dy = event.clientY - wheelStartY;
+      if (Math.hypot(dx, dy) > 4) wheelMoved = true;
+      const currentPointerAngle = angleFromCenter(event);
+      const delta = normalizeAngle(currentPointerAngle - wheelLastPointerAngle);
+      wheelRotation += delta * WHEEL_ROTATION_SENSITIVITY;
+      wheelLastPointerAngle = currentPointerAngle;
+      renderWheel(wheelRotation, topTargetFromOuterRotation(wheelRotation, activeId));
+    });
+
+    function finishWheelDrag(event) {
+      if (!wheelDragging || event.pointerId !== wheelPointerId) return;
+      const selected = topTargetFromOuterRotation(wheelRotation, activeId);
+      wheelDragging = false;
+      try { wheelRing.releasePointerCapture(event.pointerId); } catch (e) {}
+      switchTabFromWheel(selected);
+      setTimeout(() => { wheelMoved = false; }, 0);
+    }
+
+    wheelRing.addEventListener('pointerup', finishWheelDrag);
+    wheelRing.addEventListener('pointercancel', finishWheelDrag);
+  }
+
+  wheelItems.forEach(item => item.addEventListener('click', event => {
+    if (wheelMoved) {
+      event.preventDefault();
+      event.stopPropagation();
+      return;
+    }
+    if (item.dataset.target === activeId) return;
+    switchTabFromWheel(item.dataset.target);
+  }));
+
+  drawerItems.forEach(item => item.addEventListener('click', () => {
+    switchTab(item.dataset.target);
+    closeDrawer();
+  }));
+
+  searchInput.addEventListener('input', () => {
+    const q = searchInput.value.trim().toLowerCase();
+
+    if (!q) {
+      searchResults.classList.remove('visible');
+      searchResults.innerHTML = '';
+      sections.forEach(s => s.classList.remove('visible'));
+      document.getElementById(activeId).classList.add('visible');
+      return;
+    }
+
+    sections.forEach(s => s.classList.remove('visible'));
+    searchResults.classList.add('visible');
+
+    const subjectLabel = { algebra: '대수', calculus: '미적분 I', physics: '물리학', chemistry: '화학' };
+    const tagClass = { algebra: 'tag-algebra', calculus: 'tag-calculus', physics: 'tag-physics', chemistry: 'tag-chemistry' };
+
+    const matched = cleanCardsCache.filter(data => data.keywords.includes(q) || data.textContent.includes(q));
+
+    if (matched.length === 0) {
+      searchResults.innerHTML = `<div class="no-result">검색 결과가 없습니다: <strong>${escapeHTML(q)}</strong></div>`;
+      return;
+    }
+
+    searchResults.innerHTML = matched.map(data => `
+      <div class="search-result-item" data-subject="${escapeHTML(data.subject)}">
+        <span class="result-tag ${tagClass[data.subject]}">${subjectLabel[data.subject]}</span>
+        ${data.savedInnerHTML}
+      </div>
+    `).join('');
+
+    renderKatex(searchResults);
+  });
+});
+</script>
+</body>
+</html>
